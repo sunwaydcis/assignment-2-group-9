@@ -1,6 +1,3 @@
-import scalafx.application.JFXApp3
-import scalafx.application.JFXApp3.PrimaryStage
-
 import scala.io.Source
 
 
@@ -21,10 +18,28 @@ case class BedRecord (date: String,
                       hosp_noncovid: Int
                      )
 
-object Assignment2 extends JFXApp3:
+//method to find totals of hospital beds of each state
+
+//class to encapsulate methods
+
+class HospitalBedAnalysis(private val data: Array[BedRecord]):
+
+  //Method to find the state with the highest total of beds
+  def getStateWithMostBeds(): (String, Int) ={
+    //to get total beds of each state (maximum number of beds provided by each state)
+    val bedsOfState = data.groupBy(_.state).map {
+        case(state, data) =>
+          state -> data.map(_.beds).max
+      }
+    //to get the state with the highest max beds
+    bedsOfState.maxBy(_._2)
+  }
+
+
+object Assignment2 extends App:
 
   //reads .csv files into an array of each record as a String
-  val filepath = "hospital.csv"
+  val filepath = "src/main/resources/hospital.csv"
   val records = Source.fromFile(filepath).getLines.drop(1).toArray
 
   //parse data into case class BedRecord
@@ -49,12 +64,12 @@ object Assignment2 extends JFXApp3:
       )
   }
 
+  val record1 = data(0)
+  println(record1)
 
-
-  override def start(): Unit =
-    stage = new PrimaryStage()
-
-
+  //Question 1: Which state has the highest total hospital bed ?
+  val (stateName, numberOfBeds) = HospitalBedAnalysis(data).getStateWithMostBeds()
+  println(s"$stateName has the highest number of beds at $numberOfBeds beds.")
 
 
 end Assignment2
