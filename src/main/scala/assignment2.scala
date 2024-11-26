@@ -18,23 +18,28 @@ case class BedRecord (date: String,
                       hosp_noncovid: Int
                      )
 
-//method to find totals of hospital beds of each state
-
 //class to encapsulate methods
-
 class HospitalBedAnalysis(private val data: Array[BedRecord]):
+
 
   //Method to find the state with the highest total of beds
   def getStateWithMostBeds(): (String, Int) ={
     //to get total beds of each state (maximum number of beds provided by each state)
     val bedsOfState = data.groupBy(_.state).map {
-        case(state, data) =>
-          state -> data.map(_.beds).max
-      }
+      case (state, data) =>
+        state -> data.map(_.beds).max
+    }
     //to get the state with the highest max beds
     bedsOfState.maxBy(_._2)
   }
 
+  //getting the average number of beds and beds used for covid
+  val averageBeds: Double = data.map(_.beds).sum.toDouble / data.length
+  val averageCovidBeds: Double = data.map(_.beds_covid).sum.toDouble / data.length
+
+  //method to get average ratio of covid beds to hospital beds rounded to two d.p.
+  def getCovidBedsRatio(beds: Double, covidbeds: Double): Double =
+    math.round(covidbeds/beds * 100.0)/100.0
 
 object Assignment2 extends App:
 
@@ -70,6 +75,9 @@ object Assignment2 extends App:
   //Question 1: Which state has the highest total hospital bed ?
   val (stateName, numberOfBeds) = HospitalBedAnalysis(data).getStateWithMostBeds()
   println(s"$stateName has the highest number of beds at $numberOfBeds beds.")
+
+  val covidBedRatio = HospitalBedAnalysis(data).getCovidBedsRatio(HospitalBedAnalysis(data).averageBeds,HospitalBedAnalysis(data).averageCovidBeds)
+  println(s"The average ratio of beds used for covid-19 is $covidBedRatio.")
 
 
 end Assignment2
