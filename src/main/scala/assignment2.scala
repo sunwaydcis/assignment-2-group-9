@@ -74,10 +74,10 @@ object Assignment2 extends App:
 
   //Question 1: Which state has the highest total hospital bed ?
   val (stateName, numberOfBeds) = HospitalBedAnalysis(data).getStateWithMostBeds()
-  println(s"$stateName has the highest number of beds at $numberOfBeds beds.")
+  println(s"Question 1: $stateName has the highest number of beds at $numberOfBeds beds.")
 
   val covidBedRatio = HospitalBedAnalysis(data).getCovidBedsRatio(HospitalBedAnalysis(data).averageBeds,HospitalBedAnalysis(data).averageCovidBeds)
-  println(s"The average ratio of beds used for covid-19 is $covidBedRatio.")
+  println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
 
 
 end Assignment2
