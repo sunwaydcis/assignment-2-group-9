@@ -63,6 +63,32 @@ class HospitalBedAnalysis(private val data: List[BedRecord]):
     }.toArray
   }
 
+  //method to get average admitted individuals for suspected=covid and non-covid for each state
+  def getAvgSuspectedAdmission(): Map[String, (Double, Double)] = {
+    val groupedData = data.groupBy(_.state)
+
+    groupedData.map { case (state, data) =>
+      try {
+        val totalAdmitted = data.map(_.admitted_pui).sum.toDouble
+        val totalNonCovidAdmitted = data.map(record => record.admitted_total - record.admitted_covid).sum.toDouble
+        val count = data.length
+
+        if (count == 0) throw new ArithmeticException("There are no records for state" + state)
+
+        val avgAdmitted = totalAdmitted.toDouble / count
+        val avgNonCovidAdmitted = totalNonCovidAdmitted.toDouble / count
+
+        state -> (avgAdmitted, avgNonCovidAdmitted)
+      }
+
+      catch {
+        case e: Exception =>
+          println(s"Error processing state $state: ${e.getMessage}")
+          state -> (0.0, 0.0)
+      }
+    }
+  }
+
 object Assignment2 extends App:
 
   //reads .csv files into an array of each record as a String
@@ -94,12 +120,20 @@ object Assignment2 extends App:
   //Question 1: Which state has the highest total hospital bed ?
   val (stateName, numberOfBeds) = HospitalBedAnalysis(data).calcStateWithMostBeds()
   println(s"Question 1: $stateName has the highest number of beds at $numberOfBeds beds.")
+  println()
 
+<<<<<<< Updated upstream
   //Question 2: What are the ratio of bed dedicated for COVID-19 to total of available hospital bed in the dataset ?
   val covidBedRatio = Round(HospitalBedAnalysis(data).calcCovidBedsRatio()).round
   println("----")
+=======
+  //Question 2: What are the ratio of bed dedicated for COVID-19 to total of available hospital bed ?
+  val covidBedRatio = HospitalBedAnalysis(data).getCovidBedsRatio(HospitalBedAnalysis(data).averageBeds,HospitalBedAnalysis(data).averageCovidBeds)
+>>>>>>> Stashed changes
   println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
+  println()
 
+<<<<<<< Updated upstream
   //Question 3: What are the averages of individuals in category x where x can be suspected/probable, COVID-19 positive, or non-COVID is being admitted to hospitals for each state?
   println("----")
   println(s"Question 3: The average number of individuals of category X in each state: ")
@@ -116,6 +150,18 @@ object Assignment2 extends App:
     println("----")
   }
 
+=======
+  //Question 3: What are the average of individuals in category x where x can be suspected COVID-19 positive, or non-COVID is being admitted to hospital for each state ?
+  println(s"Question 3: The average of individuals in category x where x can be suspected COVID-19 positive, or non-COVID is being admitted to hospital for each state are:")
+  val avgSuspectedAdmission = HospitalBedAnalysis(data).getAvgSuspectedAdmission()
+  avgSuspectedAdmission.foreach { case (state, (avgAdmitted, avgNonCovidAdmitted)) =>
+    println(s"State: $state")
+    println(s"Average number of suspected admission = $avgAdmitted")
+    println(s"Average number of non-COVID admission = $avgNonCovidAdmitted")
+    println()
+
+  }
+>>>>>>> Stashed changes
 
 end Assignment2
 
