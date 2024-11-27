@@ -18,11 +18,15 @@ case class BedRecord (date: String,
                       hosp_noncovid: Int
                      )
 
+//case class to round to two decimal places
+case class Round(num: Double):
+  def round: Double = math.round(num*100)/100.0
+
 //class to encapsulate methods
 class HospitalBedAnalysis(private val data: List[BedRecord]):
 
   //Method to find the state with the highest total of beds
-  def getStateWithMostBeds(): (String, Int) ={
+  def calcStateWithMostBeds(): (String, Int) ={
     //to get total beds of each state (maximum number of beds provided by each state)
     val bedsOfState = data.groupBy(_.state).map {
       case (state, data) =>
@@ -33,28 +37,28 @@ class HospitalBedAnalysis(private val data: List[BedRecord]):
   }
 
   //method to get average ratio of covid beds to hospital beds rounded to two d.p.
-  def getCovidBedsRatio(): (Double) = {
+  def calcCovidBedsRatio(): Double = {
     val totalBeds : Int = data.map(_.beds).sum
     val totalCovidBeds: Int = data.map(_.beds_covid).sum
 
     //round to 2 decimal places and return
-    math.round((totalCovidBeds.toDouble / totalBeds.toDouble) * 100) / 100.0
+    totalCovidBeds.toDouble / totalBeds.toDouble
   }
 
   //method to get average admitted of category x
-  def getAverageAdmittedOfX(): Array[(String, Double, Double, Double)] = {
+  def calcAverageAdmittedOfX(): Array[(String, Double, Double, Double)] = {
     //group data by state
     data.groupBy(_.state).map { case (state, data) =>
       (
         state,
         //to get average admissions in suspected category
-        math.round(data.map(_.admitted_pui).sum.toDouble / data.length.toDouble).toDouble,
+        data.map(_.admitted_pui).sum.toDouble / data.length.toDouble,
 
         //to get average admissions in Covid category
-        math.round(data.map(_.admitted_covid).sum.toDouble / data.length.toDouble).toDouble,
+        data.map(_.admitted_covid).sum.toDouble / data.length.toDouble,
 
         //to get average admissions in Non-covid category
-        ((data.map(_.admitted_total).sum.toDouble - data.map(_.admitted_covid).sum.toDouble) / data.length.toDouble).toDouble
+        (data.map(_.admitted_total).sum.toDouble - data.map(_.admitted_covid).sum.toDouble) / data.length.toDouble
       )
     }.toArray
   }
@@ -87,28 +91,30 @@ object Assignment2 extends App:
       )
   }
 
-  val record1 = data(0)
-  println(record1)
-
   //Question 1: Which state has the highest total hospital bed ?
-  val (stateName, numberOfBeds) = HospitalBedAnalysis(data).getStateWithMostBeds()
+  val (stateName, numberOfBeds) = HospitalBedAnalysis(data).calcStateWithMostBeds()
   println(s"Question 1: $stateName has the highest number of beds at $numberOfBeds beds.")
 
   //Question 2: What are the ratio of bed dedicated for COVID-19 to total of available hospital bed in the dataset ?
-  val covidBedRatio = HospitalBedAnalysis(data).getCovidBedsRatio()
+  val covidBedRatio = Round(HospitalBedAnalysis(data).calcCovidBedsRatio()).round
+  println("----")
   println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
 
   //Question 3: What are the averages of individuals in category x where x can be suspected/probable, COVID-19 positive, or non-COVID is being admitted to hospitals for each state?
-  /**println(s"Question 3: The average number of individuals of category X in each state: ")
-  val averageAdmittedOfX = HospitalBedAnalysis(data).getAverageAdmittedOfX()
+  println("----")
+  println(s"Question 3: The average number of individuals of category X in each state: ")
+  println("")
+
+
+  val averageAdmittedOfX = HospitalBedAnalysis(data).calcAverageAdmittedOfX()
   averageAdmittedOfX.foreach { case (state, xSuspected, xCovid, xNonCovid) =>
+
+    println (s"$state")
+    println (s"The average number of suspected admissions is ${Round(xSuspected).round}")
+    println (s"The average number of covid admissions is ${Round(xCovid).round}")
+    println (s"The average number of non-covid admissions is ${Round(xNonCovid).round}")
     println("----")
-    println (s"State = $state")
-    println (s"The average number of suspected admissions is $xSuspected")
-    println (s"The average number of covid admissions is $xCovid")
-    println (s"The average number of non-covid admissions is $xNonCovid")
-    println("----")
-  }**/
+  }
 
 
 end Assignment2
