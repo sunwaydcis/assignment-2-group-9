@@ -115,7 +115,9 @@ object Assignment2 extends App:
   println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
 
   //Question 3: What are the average of individuals in category x where x can be suspected COVID-19 positive, or non-COVID is being admitted to hospital for each state ?
+  println("----")
   println(s"Question 3: The average of individuals in category x where x can be suspected COVID-19 positive, or non-COVID is being admitted to hospital for each state are:")
+  println("")
   val getAvgAdmissionByState = analysis.getAvgAdmissionByState()
   getAvgAdmissionByState.foreach { case (state, (avgSuspectedAdmitted, avgCovidAdmitted, avgNonCovidAdmitted)) =>
     println(s"State: $state")
