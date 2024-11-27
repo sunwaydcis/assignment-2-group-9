@@ -19,8 +19,7 @@ case class BedRecord (date: String,
                      )
 
 //class to encapsulate methods
-class HospitalBedAnalysis(private val data: Array[BedRecord]):
-
+class HospitalBedAnalysis(private val data: List[BedRecord]):
 
   //Method to find the state with the highest total of beds
   def getStateWithMostBeds(): (String, Int) ={
@@ -33,19 +32,38 @@ class HospitalBedAnalysis(private val data: Array[BedRecord]):
     bedsOfState.maxBy(_._2)
   }
 
-  //getting the average number of beds and beds used for covid
-  val averageBeds: Double = data.map(_.beds).sum.toDouble / data.length
-  val averageCovidBeds: Double = data.map(_.beds_covid).sum.toDouble / data.length
-
   //method to get average ratio of covid beds to hospital beds rounded to two d.p.
-  def getCovidBedsRatio(beds: Double, covidbeds: Double): Double =
-    math.round(covidbeds/beds * 100.0)/100.0
+  def getCovidBedsRatio(): (Double) = {
+    val totalBeds : Int = data.map(_.beds).sum
+    val totalCovidBeds: Int = data.map(_.beds_covid).sum
+
+    //round to 2 decimal places and return
+    math.round((totalCovidBeds.toDouble / totalBeds.toDouble) * 100) / 100.0
+  }
+
+  //method to get average admitted of category x
+  def getAverageAdmittedOfX(): Array[(String, Double, Double, Double)] = {
+    //group data by state
+    data.groupBy(_.state).map { case (state, data) =>
+      (
+        state,
+        //to get average admissions in suspected category
+        math.round(data.map(_.admitted_pui).sum.toDouble / data.length.toDouble).toDouble,
+
+        //to get average admissions in Covid category
+        math.round(data.map(_.admitted_covid).sum.toDouble / data.length.toDouble).toDouble,
+
+        //to get average admissions in Non-covid category
+        ((data.map(_.admitted_total).sum.toDouble - data.map(_.admitted_covid).sum.toDouble) / data.length.toDouble).toDouble
+      )
+    }.toArray
+  }
 
 object Assignment2 extends App:
 
   //reads .csv files into an array of each record as a String
   val filepath = "src/main/resources/hospital.csv"
-  val records = Source.fromFile(filepath).getLines.drop(1).toArray
+  val records = Source.fromFile(filepath).getLines.drop(1).toList
 
   //parse data into case class BedRecord
   val data = records.map{
@@ -76,8 +94,21 @@ object Assignment2 extends App:
   val (stateName, numberOfBeds) = HospitalBedAnalysis(data).getStateWithMostBeds()
   println(s"Question 1: $stateName has the highest number of beds at $numberOfBeds beds.")
 
-  val covidBedRatio = HospitalBedAnalysis(data).getCovidBedsRatio(HospitalBedAnalysis(data).averageBeds,HospitalBedAnalysis(data).averageCovidBeds)
+  //Question 2: What are the ratio of bed dedicated for COVID-19 to total of available hospital bed in the dataset ?
+  val covidBedRatio = HospitalBedAnalysis(data).getCovidBedsRatio()
   println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
+
+  //Question 3: What are the averages of individuals in category x where x can be suspected/probable, COVID-19 positive, or non-COVID is being admitted to hospitals for each state?
+  /**println(s"Question 3: The average number of individuals of category X in each state: ")
+  val averageAdmittedOfX = HospitalBedAnalysis(data).getAverageAdmittedOfX()
+  averageAdmittedOfX.foreach { case (state, xSuspected, xCovid, xNonCovid) =>
+    println("----")
+    println (s"State = $state")
+    println (s"The average number of suspected admissions is $xSuspected")
+    println (s"The average number of covid admissions is $xCovid")
+    println (s"The average number of non-covid admissions is $xNonCovid")
+    println("----")
+  }**/
 
 
 end Assignment2
