@@ -19,7 +19,7 @@ case class BedRecord (date: String,
                      )
 
 //case class to round to two decimal places
-case class Round(num: Double):
+case class RoundTo2DP(num: Double):
   def round: Double = math.round(num*100)/100.0
 
 //class to encapsulate methods
@@ -36,13 +36,18 @@ class HospitalBedAnalysis(private val data: List[BedRecord]):
     bedsOfState.maxBy(_._2)
   }
 
-  //method to get average ratio of covid beds to hospital beds rounded to two d.p.
+  //method to get average ratio of covid beds to hospital beds
   def calcCovidBedsRatio(): Double = {
     val totalBeds : Int = data.map(_.beds).sum
     val totalCovidBeds: Int = data.map(_.beds_covid).sum
 
-    //round to 2 decimal places and return
-    totalCovidBeds.toDouble / totalBeds.toDouble
+    //validate to avoid zero division error
+    if (totalBeds == 0 || totalCovidBeds ==0){
+      0.0
+    }else{
+      totalCovidBeds.toDouble / totalBeds.toDouble
+    }
+
   }
 
   //method to get average admitted of category x
@@ -91,12 +96,14 @@ object Assignment2 extends App:
       )
   }
 
+  val analysis = new HospitalBedAnalysis(data)
+
   //Question 1: Which state has the highest total hospital bed ?
-  val (stateName, numberOfBeds) = HospitalBedAnalysis(data).calcStateWithMostBeds()
+  val (stateName, numberOfBeds) = analysis.calcStateWithMostBeds()
   println(s"Question 1: $stateName has the highest number of beds at $numberOfBeds beds.")
 
   //Question 2: What are the ratio of bed dedicated for COVID-19 to total of available hospital bed in the dataset ?
-  val covidBedRatio = Round(HospitalBedAnalysis(data).calcCovidBedsRatio()).round
+  val covidBedRatio = RoundTo2DP(analysis.calcCovidBedsRatio()).round
   println("----")
   println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
 
@@ -106,13 +113,13 @@ object Assignment2 extends App:
   println("")
 
 
-  val averageAdmittedOfX = HospitalBedAnalysis(data).calcAverageAdmittedOfX()
+  val averageAdmittedOfX = analysis.calcAverageAdmittedOfX()
   averageAdmittedOfX.foreach { case (state, xSuspected, xCovid, xNonCovid) =>
 
     println (s"$state")
-    println (s"The average number of suspected admissions is ${Round(xSuspected).round}")
-    println (s"The average number of covid admissions is ${Round(xCovid).round}")
-    println (s"The average number of non-covid admissions is ${Round(xNonCovid).round}")
+    println (s"The average number of suspected admissions is ${RoundTo2DP(xSuspected).round}")
+    println (s"The average number of covid admissions is ${RoundTo2DP(xCovid).round}")
+    println (s"The average number of non-covid admissions is ${RoundTo2DP(xNonCovid).round}")
     println("----")
   }
 
