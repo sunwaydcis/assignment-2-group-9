@@ -116,7 +116,7 @@ object Assignment2 extends App:
   getAvgAdmissionByState.foreach { case (state, (avgSuspectedAdmitted, avgCovidAdmitted, avgNonCovidAdmitted)) =>
     println(s"State: $state")
     println(s"Average number of suspected admission = $avgSuspectedAdmitted")
-    println(s"Average number of COVID admission= $avgCovidAdmitted")
+    println(s"Average number of COVID admission = $avgCovidAdmitted")
     println(s"Average number of non-COVID admission = $avgNonCovidAdmitted")
     println()
   }
