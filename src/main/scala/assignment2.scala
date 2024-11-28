@@ -23,7 +23,7 @@ extension (num:Double)
     math.round(num*100)/100.0
 
 //class to encapsulate methods
-class HospitalBedAnalysis(private val data: Array[BedRecord]):
+class HospitalBedAnalysis(private val data: List[BedRecord]):
 
   //Method to find the state with the highest total of beds
   def stateWithMostBeds(): (String, Int) =
@@ -78,7 +78,7 @@ object Assignment2 extends App:
 
   //reads .csv files into an array of each record as a String
   val sourceFile = Source.fromFile("src/main/resources/hospital.csv")
-  val records = sourceFile.getLines.drop(1).toArray
+  val records = sourceFile.getLines.drop(1).toList
 
   //parse data into case class BedRecord
   val data = records.map:
