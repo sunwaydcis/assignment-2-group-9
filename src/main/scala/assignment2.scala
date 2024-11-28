@@ -25,7 +25,7 @@ case class RoundTo2DP(num: Double):
 class HospitalBedAnalysis(private val data: Array[BedRecord]):
 
   //Method to find the state with the highest total of beds
-  def calcStateWithMostBeds(): (String, Int) =
+  def StateWithMostBeds(): (String, Int) =
     //to get total beds of each state (maximum number of beds provided by each state)
     val bedsOfState = data.groupBy(_.state).map:
       case (state, data) =>
@@ -35,7 +35,7 @@ class HospitalBedAnalysis(private val data: Array[BedRecord]):
     bedsOfState.maxBy(_._2)
 
   //method to get average ratio of covid beds to hospital beds
-  def calcCovidBedsRatio(): Double =
+  def CovidBedsRatio(): Double =
     val totalBeds: Int = data.map(_.beds).sum
     val totalCovidBeds: Int = data.map(_.beds_covid).sum
 
@@ -46,7 +46,7 @@ class HospitalBedAnalysis(private val data: Array[BedRecord]):
       totalCovidBeds.toDouble / totalBeds.toDouble
     }
 
-  def getAvgAdmissionByState(): Map[String, (Double, Double, Double)] =
+  def AvgAdmissionByState(): Map[String, (Double, Double, Double)] =
     val groupedData = data.groupBy(_.state)
 
     groupedData.map:
@@ -100,11 +100,11 @@ object Assignment2 extends App:
   val analysis = new HospitalBedAnalysis(data)
 
   //Question 1: Which state has the highest total hospital bed ?
-  val (stateName, numberOfBeds) = analysis.calcStateWithMostBeds()
+  val (stateName, numberOfBeds) = analysis.StateWithMostBeds()
   println(s"Question 1: $stateName has the highest number of beds at $numberOfBeds beds.")
 
   //Question 2: What are the ratio of bed dedicated for COVID-19 to total of available hospital bed in the dataset ?
-  val covidBedRatio = RoundTo2DP(analysis.calcCovidBedsRatio()).round
+  val covidBedRatio = RoundTo2DP(analysis.CovidBedsRatio()).round
   println("----")
   println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
 
@@ -112,8 +112,8 @@ object Assignment2 extends App:
   println("----")
   println(s"Question 3: The average of individuals in category x where x can be suspected COVID-19 positive, or non-COVID is being admitted to hospital for each state are:")
   println("")
-  val getAvgAdmissionByState = analysis.getAvgAdmissionByState()
-  getAvgAdmissionByState.foreach:
+  val AvgAdmissionByState = analysis.AvgAdmissionByState()
+  AvgAdmissionByState.foreach:
     case (state, (avgSuspectedAdmitted, avgCovidAdmitted, avgNonCovidAdmitted)) =>
       println(s"State: $state")
       println(s"Average number of suspected admission = ${RoundTo2DP(avgSuspectedAdmitted).round}")
