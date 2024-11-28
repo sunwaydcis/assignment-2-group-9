@@ -25,7 +25,7 @@ case class RoundTo2DP(num: Double):
 class HospitalBedAnalysis(private val data: Array[BedRecord]):
 
   //Method to find the state with the highest total of beds
-  def calcStateWithMostBeds(): (String, Int) ={
+  def stateWithMostBeds(): (String, Int) ={
     //to get total beds of each state (maximum number of beds provided by each state)
     val bedsOfState = data.groupBy(_.state).map {
       case (state, data) =>
@@ -35,8 +35,8 @@ class HospitalBedAnalysis(private val data: Array[BedRecord]):
     bedsOfState.maxBy(_._2)
   }
 
-  //method to get average ratio of covid beds to hospital beds
-  def calcCovidBedsRatio(): Double = {
+  //method to get average ratio of covid beds to hospital beds -naming
+  def covidBedsRatio(): Double = {
     val totalBeds: Int = data.map(_.beds).sum
     val totalCovidBeds: Int = data.map(_.beds_covid).sum
 
@@ -48,9 +48,11 @@ class HospitalBedAnalysis(private val data: Array[BedRecord]):
     }
   }
 
+  // method of getting admissions of each catgoery grouped by state - naming
   def getAvgAdmissionByState(): Map[String, (Double, Double, Double)] = {
     val groupedData = data.groupBy(_.state)
 
+    //change to scala3 syntax
     groupedData.map { case (state, data) =>
       try {
         val totalSuspectedAdmitted = data.map(_.admitted_pui).sum.toDouble
@@ -81,7 +83,7 @@ object Assignment2 extends App:
   val sourceFile = Source.fromFile("src/main/resources/hospital.csv")
   val records = sourceFile.getLines.drop(1).toArray
 
-  //parse data into case class BedRecord
+  //parse data into case class BedRecord - hardcoded
   val data = records.map{
     line =>
       val cols = line.split(",")
@@ -103,14 +105,18 @@ object Assignment2 extends App:
       )
   }
 
+  val data2 = records.map{
+    line => 
+  }
+
   val analysis = new HospitalBedAnalysis(data)
 
   //Question 1: Which state has the highest total hospital bed ?
-  val (stateName, numberOfBeds) = analysis.calcStateWithMostBeds()
+  val (stateName, numberOfBeds) = analysis.stateWithMostBeds()
   println(s"Question 1: $stateName has the highest number of beds at $numberOfBeds beds.")
 
   //Question 2: What are the ratio of bed dedicated for COVID-19 to total of available hospital bed in the dataset ?
-  val covidBedRatio = RoundTo2DP(analysis.calcCovidBedsRatio()).round
+  val covidBedRatio = RoundTo2DP(analysis.covidBedsRatio()).round
   println("----")
   println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
 
