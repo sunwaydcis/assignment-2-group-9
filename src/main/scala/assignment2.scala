@@ -25,18 +25,17 @@ case class RoundTo2DP(num: Double):
 class HospitalBedAnalysis(private val data: Array[BedRecord]):
 
   //Method to find the state with the highest total of beds
-  def calcStateWithMostBeds(): (String, Int) ={
+  def calcStateWithMostBeds(): (String, Int) =
     //to get total beds of each state (maximum number of beds provided by each state)
-    val bedsOfState = data.groupBy(_.state).map {
+    val bedsOfState = data.groupBy(_.state).map:
       case (state, data) =>
         state -> data.map(_.beds).max
-    }
+
     //to get the state with the highest max beds
     bedsOfState.maxBy(_._2)
-  }
 
   //method to get average ratio of covid beds to hospital beds
-  def calcCovidBedsRatio(): Double = {
+  def calcCovidBedsRatio(): Double =
     val totalBeds: Int = data.map(_.beds).sum
     val totalCovidBeds: Int = data.map(_.beds_covid).sum
 
@@ -46,34 +45,30 @@ class HospitalBedAnalysis(private val data: Array[BedRecord]):
     } else {
       totalCovidBeds.toDouble / totalBeds.toDouble
     }
-  }
 
-  def getAvgAdmissionByState(): Map[String, (Double, Double, Double)] = {
+  def getAvgAdmissionByState(): Map[String, (Double, Double, Double)] =
     val groupedData = data.groupBy(_.state)
 
-    groupedData.map { case (state, data) =>
-      try {
+    groupedData.map:
+      case (state, data) =>
+      try
         val totalSuspectedAdmitted = data.map(_.admitted_pui).sum.toDouble
         val totalCovidAdmitted = data.map(_.admitted_covid).sum.toDouble
         val totalNonCovidAdmitted = data.map(record => record.admitted_total - record.admitted_covid).sum.toDouble
         val count = data.length
 
-        if (count == 0) throw new ArithmeticException("There are no records for state" + state)
+        if (count == 0) throw ArithmeticException("There are no records for " + state)
 
         val avgAdmitted = totalSuspectedAdmitted / count
         val avgCovidAdmitted = totalCovidAdmitted / count
         val avgNonCovidAdmitted = totalNonCovidAdmitted / count
 
         state -> (avgAdmitted, avgCovidAdmitted, avgNonCovidAdmitted)
-      }
 
-      catch {
+      catch
         case e: Exception =>
           println(s"Error processing state $state: ${e.getMessage}")
           state -> (0.0, 0.0, 0.0)
-      }
-    }
-  }
 
 object Assignment2 extends App:
 
@@ -82,7 +77,7 @@ object Assignment2 extends App:
   val records = sourceFile.getLines.drop(1).toArray
 
   //parse data into case class BedRecord
-  val data = records.map{
+  val data = records.map:
     line =>
       val cols = line.split(",")
       BedRecord(
@@ -101,7 +96,6 @@ object Assignment2 extends App:
         hosp_pui = cols(12).toInt,
         hosp_noncovid = cols(13).toInt
       )
-  }
 
   val analysis = new HospitalBedAnalysis(data)
 
@@ -119,14 +113,14 @@ object Assignment2 extends App:
   println(s"Question 3: The average of individuals in category x where x can be suspected COVID-19 positive, or non-COVID is being admitted to hospital for each state are:")
   println("")
   val getAvgAdmissionByState = analysis.getAvgAdmissionByState()
-  getAvgAdmissionByState.foreach { case (state, (avgSuspectedAdmitted, avgCovidAdmitted, avgNonCovidAdmitted)) =>
-    println(s"State: $state")
-    println(s"Average number of suspected admission = ${RoundTo2DP(avgSuspectedAdmitted).round}")
-    println(s"Average number of COVID admission = ${RoundTo2DP(avgCovidAdmitted).round}")
-    println(s"Average number of non-COVID admission = ${RoundTo2DP(avgNonCovidAdmitted).round}")
-    println()
-  }
-
+  getAvgAdmissionByState.foreach:
+    case (state, (avgSuspectedAdmitted, avgCovidAdmitted, avgNonCovidAdmitted)) =>
+      println(s"State: $state")
+      println(s"Average number of suspected admission = ${RoundTo2DP(avgSuspectedAdmitted).round}")
+      println(s"Average number of COVID admission = ${RoundTo2DP(avgCovidAdmitted).round}")
+      println(s"Average number of non-COVID admission = ${RoundTo2DP(avgNonCovidAdmitted).round}")
+      println()
+  
   sourceFile.close()
 
 end Assignment2
