@@ -17,15 +17,16 @@ case class BedRecord (date: String,
                       hosp_noncovid: Int
                      )
 
-//case class to round to two decimal places
-case class RoundTo2DP(num: Double):
-  def round: Double = math.round(num*100)/100.0
+//extension method to round to two decimal place
+extension (num:Double)
+  def roundTo2DP: Double=
+    math.round(num*100)/100.0
 
 //class to encapsulate methods
 class HospitalBedAnalysis(private val data: Array[BedRecord]):
 
   //Method to find the state with the highest total of beds
-  def StateWithMostBeds(): (String, Int) =
+  def stateWithMostBeds(): (String, Int) =
     //to get total beds of each state (maximum number of beds provided by each state)
     val bedsOfState = data.groupBy(_.state).map {
       case (state, data) =>
@@ -33,10 +34,10 @@ class HospitalBedAnalysis(private val data: Array[BedRecord]):
     }
     //to get the state with the highest max beds
     bedsOfState.maxBy(_._2)
-  }
+
 
   //method to get average ratio of covid beds to hospital beds
-  def CovidBedsRatio(): Double =
+  def covidBedsRatio(): Double =
     val totalBeds: Int = data.map(_.beds).sum
     val totalCovidBeds: Int = data.map(_.beds_covid).sum
 
@@ -46,10 +47,10 @@ class HospitalBedAnalysis(private val data: Array[BedRecord]):
     } else {
       totalCovidBeds.toDouble / totalBeds.toDouble
     }
-  }
+
 
   // method of getting admissions of each catgoery grouped by state - naming
-  def AvgAdmissionByState(): Map[String, (Double, Double, Double)] =
+  def avgAdmissionByState(): Map[String, (Double, Double, Double)] =
     val groupedData = data.groupBy(_.state)
 
     groupedData.map:
@@ -103,11 +104,11 @@ object Assignment2 extends App:
   val analysis = new HospitalBedAnalysis(data)
 
   //Question 1: Which state has the highest total hospital bed ?
-  val (stateName, numberOfBeds) = analysis.StateWithMostBeds()
+  val (stateName, numberOfBeds) = analysis.stateWithMostBeds()
   println(s"Question 1: $stateName has the highest number of beds at $numberOfBeds beds.")
 
   //Question 2: What are the ratio of bed dedicated for COVID-19 to total of available hospital bed in the dataset ?
-  val covidBedRatio = RoundTo2DP(analysis.CovidBedsRatio()).round
+  val covidBedRatio = roundTo2DP(analysis.covidBedsRatio())
   println("----")
   println(s"Question 2: The average ratio of beds used for covid-19 is $covidBedRatio.")
 
@@ -115,13 +116,13 @@ object Assignment2 extends App:
   println("----")
   println(s"Question 3: The average of individuals in category x where x can be suspected COVID-19 positive, or non-COVID is being admitted to hospital for each state are:")
   println("")
-  val AvgAdmissionByState = analysis.AvgAdmissionByState()
+  val AvgAdmissionByState = analysis.avgAdmissionByState()
   AvgAdmissionByState.foreach:
     case (state, (avgSuspectedAdmitted, avgCovidAdmitted, avgNonCovidAdmitted)) =>
       println(s"State: $state")
-      println(s"Average number of suspected admission = ${RoundTo2DP(avgSuspectedAdmitted).round}")
-      println(s"Average number of COVID admission = ${RoundTo2DP(avgCovidAdmitted).round}")
-      println(s"Average number of non-COVID admission = ${RoundTo2DP(avgNonCovidAdmitted).round}")
+      println(s"Average number of suspected admission = ${roundTo2DP(avgSuspectedAdmitted)}")
+      println(s"Average number of COVID admission = ${roundTo2DP(avgCovidAdmitted)}")
+      println(s"Average number of non-COVID admission = ${roundTo2DP(avgNonCovidAdmitted)}")
       println()
 
   sourceFile.close()
