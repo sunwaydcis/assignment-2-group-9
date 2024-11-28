@@ -48,7 +48,6 @@ class HospitalBedAnalysis(private val data: List[BedRecord]):
       totalCovidBeds.toDouble / totalBeds.toDouble
     }
 
-
   // method of getting admissions of each catgoery grouped by state - naming
   def avgAdmissionByState(): Map[String, (Double, Double, Double)] =
     val groupedData = data.groupBy(_.state)
@@ -78,7 +77,7 @@ object Assignment2 extends App:
 
   //reads .csv files into an array of each record as a String
   val sourceFile = Source.fromFile("src/main/resources/hospital.csv")
-  val records = sourceFile.getLines.drop(1).toList
+  val records = sourceFile.getLines.toList.tail
 
   //parse data into case class BedRecord
   val data = records.map:
